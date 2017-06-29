@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport"
+          content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,initial-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telphone=no, email=no">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <title>test</title>
+    <style>
+        *{margin:0;padding:0;}
+        body{color:#333; padding:.2rem .4rem;}
+        p{font-size:.24rem; line-height: .4rem; padding:.2rem 0;}
+        h3{font-size:.28rem; line-height: .4rem; padding:.2rem 0;}
+
+    </style>
+</head>
+<body>
+<div class="callApp" id="show" onclick="js();">callApp</div>
+
+</body>
+
+</html>
+<script>
+	function setupWebViewJavascriptBridge(callback) {
+
+	    if (window.WebViewJavascriptBridge) {
+	      document.getElementById("show").innerHTML ="123";
+	     return callback(WebViewJavascriptBridge);
+	    }else{
+		 document.getElementById("show").innerHTML ="456";
+		}
+	    if (window.WVJBCallbacks) { return window.WVJBCallbacks.push(callback); }
+	    window.WVJBCallbacks = [callback];
+	    var WVJBIframe = document.createElement('iframe');
+	    WVJBIframe.style.display = 'none';
+	    WVJBIframe.src = 'https://__bridge_loaded__';
+	    document.documentElement.appendChild(WVJBIframe);
+	    setTimeout(function() { document.documentElement.removeChild(WVJBIframe) }, 0)
+	}
+
+	setupWebViewJavascriptBridge(function(bridge) {
+		// app调用H5的方法
+		bridge.registerHandler('bridgeInit', function(data, responseCallback) {
+			alert(responseData)
+		});
+
+		document.querySelector(".callApp").onclick = function(){
+
+
+			alert("htmltext");
+			// 调用app客户端的方法
+			bridge.callHandler('bridgeGetAppSetting', {'type': 1}, function(response) {
+				alert("text:" + JSON.stringify(response));
+			})
+		}
+	})
+
+	  function js() {
+            //call native method
+            window.WebViewJavascriptBridge.callHandler(
+                'bridgeGetAppSetting'
+                , {'type': '1'}
+                , function(responseData) {
+
+                    document.getElementById("show").innerHTML = "text:"+responseData;
+                }
+            );
+        }
+
+
+
+</script>
